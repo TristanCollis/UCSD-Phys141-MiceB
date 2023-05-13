@@ -31,7 +31,7 @@ def grav_3body(
     r = (massive_points[np.newaxis].transpose(1, 0, 2)
          - massless_points[np.newaxis])
 
-    r_norm = np.linalg.norm(r, axis=-1)
+    r_norm = np.linalg.norm(r, axis=-1)[np.newaxis].transpose(1, 2, 0)
 
     return np.sum(
         masses.reshape(-1, 1, 1)
@@ -57,9 +57,9 @@ def grav_2body(points: np.ndarray[float, Any], masses: np.ndarray[float, Any], e
     -------
     np.ndarray[float, (2, 3)]
         Acceleration on each massive point.
-    """    
+    """
 
     r = points[::-1, :] - points
-    r_norm = np.linalg.norm(r, axis=-1)
+    r_norm = np.linalg.norm(r, axis=-1).transpose(1, 2, 0)
 
-    return masses[::-1] * (r / r_norm) / (r_norm + epsilon)**2 
+    return masses[::-1] * (r / r_norm[np.newaxis]) / (r_norm + epsilon)**2
