@@ -41,38 +41,38 @@ def leapfrog(m, n, init_pos, init_vel, init_pos_massive, init_vel_massive, time,
 
     
     # set the output array of 3 massless bodies 
-    position = np.zeros((n,3,time/time_step +1))
-    velocity = np.zeros((n,3,time/time_step +1))
+    position = np.zeros((time/time_step +1,n,3))
+    velocity = np.zeros((time/time_step +1,n,3))
     # set the first tensor of the output to be our initial condition
-    position[:,:,0] = init_pos
-    velocity[:,:,0] = init_vel
+    position[0,:,:] = init_pos
+    velocity[0,:,:] = init_vel
     
     # set the output array of 2 massive bodies 
-    position_m = np.zeros((m,3,time/time_step +1))
-    velocity_m = np.zeros((m,3,time/time_step +1))
+    position_m = np.zeros((time/time_step +1,m,3))
+    velocity_m = np.zeros((time/time_step +1,m,3))
     # set the first tensor of the output to be our initial condition
-    position_m[:,:,0] = init_pos_massive
-    velocity_m[:,:,0] = init_vel_massive
+    position_m[0,:,:] = init_pos_massive
+    velocity_m[0,:,:] = init_vel_massive
     
     for i in range(time/time_step):
         
         #find the half step velocity 
-        vel = velocity[:,:,i] + (grav_3body(position[:,:,i],position_m[:,:,i],masses,epsilon)*time_step/2)
-        vel_m = velocity_m[:,:,i] + (grav_2body(position_m[:,:,i],masses,epsilon)*time_step/2)
+        vel = velocity[i,:,:] + (grav_3body(position[i,:,:],position_m[i,:,:],masses,epsilon)*time_step/2)
+        vel_m = velocity_m[i,:,:] + (grav_2body(position_m[i,:,:],masses,epsilon)*time_step/2)
         
         #find the full-step position
-        pos = position[:,:,0] + (vel*time_step)
-        pos_m = position_m[:,:,0] + (vel_m*time_step)
+        pos = position[i,:,:] + (vel*time_step)
+        pos_m = position_m[i,:,:] + (vel_m*time_step)
         
         #find the full-step velocity
         vel = vel + (grav_3body(pos,pos_m,masses,epsilon)*time_step/2)
         vel_m = vel_m + (grav_2body(pos_m,masses,epsilon)*time_step/2)
         
         #add our integrated calculation to the output tensor
-        position[:,:,i+1] = pos 
-        velocity[:,:,i+1] = vel
-        position_m[:,:,i+1] = pos_m 
-        velocity_m[:,:,i+1] = vel_m
+        position[i+1,:,:] = pos 
+        velocity[i+1,:,:] = vel
+        position_m[i+1,:,:] = pos_m 
+        velocity_m[i+1,:,:] = vel_m
         
     return position, velocity, position_m, velocity_m
     
