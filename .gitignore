@@ -162,5 +162,7 @@ cython_debug/
 # Local scratchpads
 [Ss]cratchpad*
 
-# Local IDE files
+# Local IDE files and profiling files
 .vscode
+*-profile
+profile.json
