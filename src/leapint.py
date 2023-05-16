@@ -7,21 +7,33 @@ import gravity
 def leapfrog(m: int, n: int, init_pos: np.ndarray[float, Any], init_vel: np.ndarray[float, Any], init_pos_massive: np.ndarray[float, Any], init_vel_massive: np.ndarray[float, Any], time, time_step, masses: np.ndarray[float, Any], epsilon: float) -> tuple:
     """leapfrog integration for 3 massless bodies
 
-    Args:
-        m (int): Number of massive planet
-        n (int): Number of massless planet
-        init_pos (np.ndarray[float, (n,3)]): Array of initial position of 3 massless bodies
-        init_vel (np.ndarray[float, (n,3)]): Array of initial velocity of 3 massless bodies
-        init_pos_massive (np.ndarray[float, (m,3)]): Array of initial position of 2 massive points
-        init_vel_massive (np.ndarray[float, (m,3)]): Array of initial velocity of 2 massive points
-        time (_type_): number of time we integrate
-        time_step (_type_): smaller time_step to do integration
-        masses (np.ndarray[float, Any]): Masses corresponding to the given points.
-        epsilon (float): Softening factor
+    Parameters
+    ----------
+    m : int
+        Number of massive planet
+    n : int
+        Number of massless planet
+    init_pos : np.ndarray[float, (n,3)]
+        Array of initial position of 3 massless bodies
+    init_vel : np.ndarray[float, (n,3)]
+        Array of initial velocity of 3 massless bodies
+    init_pos_massive : np.ndarray[float, (m,3)]
+        Array of initial position of 2 massive points
+    init_vel_massive : np.ndarray[float, (m,3)]
+        Array of initial velocity of 2 massive points
+    time : _type_
+        number of time we integrate
+    time_step : _type_
+        smaller time_step to do integration
+    masses : np.ndarray[float, (m,)]
+        Masses corresponding to the given points.
+    epsilon : float
+        Softening factor
 
-
-    Returns:
-        tuple: _description_
+    Returns
+    -------
+    tuple
+        _description_
     """
 
     # set the matrix that we will use in the leapfrog integrator
