@@ -41,7 +41,11 @@ def grav_3body(
     )
 
 
-def grav_2body(points: np.ndarray[float, Any], masses: np.ndarray[float, Any], epsilon: float) -> np.ndarray[float, Any]:
+def grav_2body(
+        points: np.ndarray[float, Any],
+        masses: np.ndarray[float, Any],
+        epsilon: float,
+) -> np.ndarray[float, Any]:
     """Direct gravity acceleration between 2 massive points.
 
     Parameters
