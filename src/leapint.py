@@ -4,7 +4,7 @@ import numpy as np
 import gravity
 
 
-def leapfrog(m: int, n: int, init_pos: np.ndarray[float, Any], init_vel: np.ndarray[float, Any], init_pos_massive: np.ndarray[float, Any], init_vel_massive: np.ndarray[float, Any], time, time_step, masses: np.ndarray[float, Any], epsilon: float) -> tuple[np.ndarray]:
+def leapfrog(m: int, n: int, init_pos: np.ndarray[float, Any], init_vel: np.ndarray[float, Any], init_pos_massive: np.ndarray[float, Any], init_vel_massive: np.ndarray[float, Any], time, time_step, masses: np.ndarray[float, Any], epsilon: float) -> tuple:
     """leapfrog integration for 3 massless bodies
 
     Args:
@@ -21,7 +21,7 @@ def leapfrog(m: int, n: int, init_pos: np.ndarray[float, Any], init_vel: np.ndar
 
 
     Returns:
-        tuple[np.ndarray]: _description_
+        tuple: _description_
     """
 
     # set the matrix that we will use in the leapfrog integrator
@@ -52,15 +52,18 @@ def leapfrog(m: int, n: int, init_pos: np.ndarray[float, Any], init_vel: np.ndar
         vel = velocity[i, :, :] + (gravity.grav_3body(position[i, :, :],
                                    position_m[i, :, :], masses, epsilon)*time_step/2)
         vel_m = velocity_m[i, :, :] + \
-            (gravity.grav_2body(position_m[i, :, :], masses, epsilon)*time_step/2)
+            (gravity.grav_2body(
+                position_m[i, :, :], masses, epsilon)*time_step/2)
 
         # find the full-step position
         pos = position[i, :, :] + (vel*time_step)
         pos_m = position_m[i, :, :] + (vel_m*time_step)
 
         # find the full-step velocity
-        vel = vel + (gravity.grav_3body(pos, pos_m, masses, epsilon)*time_step/2)
-        vel_m = vel_m + (gravity.grav_2body(pos_m, masses, epsilon)*time_step/2)
+        vel = vel + (gravity.grav_3body(pos, pos_m,
+                     masses, epsilon)*time_step/2)
+        vel_m = vel_m + (gravity.grav_2body(pos_m,
+                         masses, epsilon)*time_step/2)
 
         # add our integrated calculation to the output tensor
         position[i+1, :, :] = pos
