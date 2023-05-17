@@ -4,15 +4,11 @@ import numpy as np
 import gravity
 
 
-def leapfrog(m: int, n: int, init_pos: np.ndarray[float, Any], init_vel: np.ndarray[float, Any], init_pos_massive: np.ndarray[float, Any], init_vel_massive: np.ndarray[float, Any], time, time_step, masses: np.ndarray[float, Any], epsilon: float) -> tuple:
+def leapfrog(init_pos: np.ndarray[float, Any], init_vel: np.ndarray[float, Any], init_pos_massive: np.ndarray[float, Any], init_vel_massive: np.ndarray[float, Any], timestep: int, dt: float, masses: np.ndarray[float, Any], epsilon: float) -> tuple:
     """leapfrog integration for 3 massless bodies
 
     Parameters
     ----------
-    m : int
-        Number of massive planet
-    n : int
-        Number of massless planet
     init_pos : np.ndarray[float, (n,3)]
         Array of initial position of 3 massless bodies
     init_vel : np.ndarray[float, (n,3)]
@@ -21,9 +17,9 @@ def leapfrog(m: int, n: int, init_pos: np.ndarray[float, Any], init_vel: np.ndar
         Array of initial position of 2 massive points
     init_vel_massive : np.ndarray[float, (m,3)]
         Array of initial velocity of 2 massive points
-    time : _type_
+    timestep : int
         number of time we integrate
-    time_step : _type_
+    dt : float
         smaller time_step to do integration
     masses : np.ndarray[float, (m,)]
         Masses corresponding to the given points.
@@ -35,7 +31,11 @@ def leapfrog(m: int, n: int, init_pos: np.ndarray[float, Any], init_vel: np.ndar
     tuple
         _description_
     """
-
+    
+    # set the number of massless particle as n and massive particle as m
+    m,a = init_pos_massive.shape
+    n,a = init_pos.shape
+    
     # set the matrix that we will use in the leapfrog integrator
     pos = np.zeros((n, 3))
     vel = np.zeros((n, 3))
@@ -43,39 +43,39 @@ def leapfrog(m: int, n: int, init_pos: np.ndarray[float, Any], init_vel: np.ndar
     vel_m = np.zeros((m, 3))
 
     # set the output array of 3 massless bodies
-    position = np.zeros((time/time_step + 1, n, 3))
-    velocity = np.zeros((time/time_step + 1, n, 3))
+    position = np.zeros((timestep + 1, n, 3))
+    velocity = np.zeros((timestep + 1, n, 3))
 
     # set the first tensor of the output to be our initial condition
     position[0, :, :] = init_pos
     velocity[0, :, :] = init_vel
 
     # set the output array of 2 massive bodies
-    position_m = np.zeros((time/time_step + 1, m, 3))
-    velocity_m = np.zeros((time/time_step + 1, m, 3))
+    position_m = np.zeros((timestep + 1, m, 3))
+    velocity_m = np.zeros((timestep + 1, m, 3))
 
     # set the first tensor of the output to be our initial condition
     position_m[0, :, :] = init_pos_massive
     velocity_m[0, :, :] = init_vel_massive
 
-    for i in range(time/time_step):
+    for i in range(time_step):
 
         # find the half step velocity
         vel = velocity[i, :, :] + (gravity.grav_3body(position[i, :, :],
-                                   position_m[i, :, :], masses, epsilon)*time_step/2)
+                                   position_m[i, :, :], masses, epsilon)*dt/2)
         vel_m = velocity_m[i, :, :] + \
             (gravity.grav_2body(
-                position_m[i, :, :], masses, epsilon)*time_step/2)
+                position_m[i, :, :], masses, epsilon)*dt/2)
 
         # find the full-step position
-        pos = position[i, :, :] + (vel*time_step)
-        pos_m = position_m[i, :, :] + (vel_m*time_step)
+        pos = position[i, :, :] + (vel*dt)
+        pos_m = position_m[i, :, :] + (vel_m*dt)
 
         # find the full-step velocity
         vel = vel + (gravity.grav_3body(pos, pos_m,
-                     masses, epsilon)*time_step/2)
+                     masses, epsilon)*dt/2)
         vel_m = vel_m + (gravity.grav_2body(pos_m,
-                         masses, epsilon)*time_step/2)
+                         masses, epsilon)*dt/2)
 
         # add our integrated calculation to the output tensor
         position[i+1, :, :] = pos
