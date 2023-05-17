@@ -60,15 +60,15 @@ def leapfrog(init_pos: np.ndarray[float, Any], init_vel: np.ndarray[float, Any],
     for i in range(timestep):
 
         # find the half step velocity
-        vel = velocity[i, :, :] + (gravity.grav_3body(position[i, :, :],
+        vel = np.squeeze(velocity[i, :, :]) + (gravity.grav_3body(position[i, :, :],
                                    position_m[i, :, :], masses, epsilon)*dt/2)
-        vel_m = velocity_m[i, :, :] + \
+        vel_m = np.squeeze(velocity_m[i, :, :]) + \
             (gravity.grav_direct(
                 position_m[i, :, :], masses, epsilon)*dt/2)
 
         # find the full-step position
-        pos = position[i, :, :] + (vel*dt)
-        pos_m = position_m[i, :, :] + (vel_m*dt)
+        pos = np.squeeze(position[i, :, :]) + (vel*dt)
+        pos_m = np.squeeze(position_m[i, :, :]) + (vel_m*dt)
 
         # find the full-step velocity
         vel = vel + (gravity.grav_3body(pos, pos_m,
