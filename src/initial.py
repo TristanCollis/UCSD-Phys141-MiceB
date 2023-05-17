@@ -30,7 +30,7 @@ def initmice(R_min:float, mass:float, time_unit:float, wA:float, wB:float, iA:fl
     vel_mag = np.sqrt(2*mass*(2/(Rapoc)-1/a)) 
 
     #Set Galaxy velocities
-    vel_m = np.array([[1, 0, 0]*vel_mag, [-1, 0, 0]*vel_mag])
+    vel_m = np.array([[vel_mag, 0, 0], [-vel_mag, 0, 0]])
 
     #Propogate velocities to masslessparticles
     velA_CM = velA_rot+vel_m[0]
