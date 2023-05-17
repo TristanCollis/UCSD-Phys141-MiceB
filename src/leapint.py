@@ -1,8 +1,7 @@
 from typing import Any
 
 import numpy as np
-import gravity
-
+from . import gravity
 
 def leapfrog(init_pos: np.ndarray[float, Any], init_vel: np.ndarray[float, Any], init_pos_massive: np.ndarray[float, Any], init_vel_massive: np.ndarray[float, Any], timestep: int, dt: float, masses: np.ndarray[float, Any], epsilon: float) -> tuple:
     """leapfrog integration for 3 massless bodies
@@ -58,23 +57,23 @@ def leapfrog(init_pos: np.ndarray[float, Any], init_vel: np.ndarray[float, Any],
     position_m[0, :, :] = init_pos_massive
     velocity_m[0, :, :] = init_vel_massive
 
-    for i in range(time_step):
+    for i in range(timestep):
 
         # find the half step velocity
-        vel = velocity[i, :, :] + (gravity.grav_3body(position[i, :, :],
+        vel = np.squeeze(velocity[i, :, :]) + (gravity.grav_3body(position[i, :, :],
                                    position_m[i, :, :], masses, epsilon)*dt/2)
-        vel_m = velocity_m[i, :, :] + \
-            (gravity.grav_2body(
+        vel_m = np.squeeze(velocity_m[i, :, :]) + \
+            (gravity.grav_direct(
                 position_m[i, :, :], masses, epsilon)*dt/2)
 
         # find the full-step position
-        pos = position[i, :, :] + (vel*dt)
-        pos_m = position_m[i, :, :] + (vel_m*dt)
+        pos = np.squeeze(position[i, :, :]) + (vel*dt)
+        pos_m = np.squeeze(position_m[i, :, :]) + (vel_m*dt)
 
         # find the full-step velocity
         vel = vel + (gravity.grav_3body(pos, pos_m,
                      masses, epsilon)*dt/2)
-        vel_m = vel_m + (gravity.grav_2body(pos_m,
+        vel_m = vel_m + (gravity.grav_direct(pos_m,
                          masses, epsilon)*dt/2)
 
         # add our integrated calculation to the output tensor

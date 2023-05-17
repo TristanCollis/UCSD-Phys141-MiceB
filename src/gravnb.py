@@ -1,8 +1,15 @@
 from typing import Any
 
 import numpy as np
+from numba import njit, float64
 
 
+@njit
+def norm(array: np.ndarray[float, Any], axis: int) -> np.ndarray[float, Any]:
+    return np.sqrt(np.sum(array**2, axis=axis))
+
+
+@njit(float64[:,:](float64[:,:], float64[:,:], float64[:,:], float64))
 def grav_3body(
         massless_points: np.ndarray[float, Any],
         massive_points: np.ndarray[float, Any],
@@ -28,19 +35,20 @@ def grav_3body(
         Accelerations to be applied to the massless bodies.
     """
 
-    r = (massive_points[np.newaxis].transpose(1, 0, 2)
-         - massless_points[np.newaxis])
+    r = (np.expand_dims(massive_points, 1)
+         - np.expand_dims(massless_points, 0))
 
-    r_norm = np.linalg.norm(r, axis=-1)[np.newaxis].transpose(1, 2, 0)
+    r_norm = np.expand_dims(norm(r, axis=2), 2)
 
     return np.sum(
-        masses.reshape(-1, 1, 1)
+        np.expand_dims(masses, (1, 1))
         * (r / r_norm)
         / (r_norm + epsilon)**2,
         axis=0
     )
 
 
+@njit(float64[:,:](float64[:,:], float64[:,:], float64))
 def grav_direct(
         points: np.ndarray[float, Any],
         masses: np.ndarray[float, Any],
@@ -64,3 +72,5 @@ def grav_direct(
     """
 
     return grav_3body(points, points, masses, epsilon)
+
+
