@@ -21,9 +21,18 @@ def initmice(R_min:float, mass:float, time_unit:float, wA:float, wB:float, iA:fl
     posA_CM = posA_rot+pos_m[0]
     posB_CM = posB_rot+pos_m[1]
 
-    #Set the velocities of the each galaxy TODO
-    vel_m = np.array([[0, 0, 0], [0, 0, 0]])
+    #Set the velocities of the each galaxy
 
+    #Semimajor axis
+    a = (R_min+Rapoc)/2
+
+    #Use vis a vis equation for orbital valocity
+    vel_mag = np.sqrt(2*mass*(2/(Rapoc)-1/a)) 
+
+    #Set Galaxy velocities
+    vel_m = np.array([[1, 0, 0]*vel_mag, [-1, 0, 0]*vel_mag])
+
+    #Propogate velocities to masslessparticles
     velA_CM = velA_rot+vel_m[0]
     velB_CM = velB_rot+vel_m[1]
 
