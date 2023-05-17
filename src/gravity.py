@@ -41,29 +41,26 @@ def grav_3body(
     )
 
 
-def grav_2body(
+def grav_direct(
         points: np.ndarray[float, Any],
         masses: np.ndarray[float, Any],
         epsilon: float,
 ) -> np.ndarray[float, Any]:
-    """Direct gravity acceleration between 2 massive points.
+    """Direct gravity acceleration between n massive points.
 
     Parameters
     ----------
-    points : np.ndarray[float, (2, 3)]
-        Positions of the two massive points.
-    masses : np.ndarray[float, (2)]
+    points : np.ndarray[float, (n, 3)]
+        Positions of the massive points.
+    masses : np.ndarray[float, (n)]
         Masses corresponding to the given points.
     epsilon : float
         Softening factor
 
     Returns
     -------
-    np.ndarray[float, (2, 3)]
+    np.ndarray[float, (n, 3)]
         Acceleration on each massive point.
     """
 
-    r = points[::-1, :] - points
-    r_norm = np.linalg.norm(r, axis=-1).transpose(1, 2, 0)
-
-    return masses[::-1] * (r / r_norm[np.newaxis]) / (r_norm + epsilon)**2
+    return grav_3body(points, points, masses, epsilon)
