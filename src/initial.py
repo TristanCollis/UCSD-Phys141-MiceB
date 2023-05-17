@@ -1,33 +1,36 @@
 from typing import Any
 
 import numpy as np
-import matplotlib.pyplot as plt
 
 #The following functions assume the plane of orbit is the x, y axis, with positive 
 
-def initmice(R_min:float, mass:float, time_unit:float, wA:float, wb:float, ia:float, ib:float, e:float, epsilon:float) -> tuple :
+def initmice(R_min:float, mass:float, time_unit:float, wA:float, wB:float, iA:float, iB:float, e:float, epsilon:float) -> tuple :
 
     #Disk Inits in galaxy frame
     posA, velA = initdisk(R_min, mass, epsilon)
     posB, velB = initdisk(R_min, mass, epsilon)
 
-    Rapoc = R_min*(1+e)/(1-e)
-
-    #Transform into galaxy frame using angles TODO
-    velA_CM = velA
-    velB_CM = velB
-
+    #Rotate galaxies according to angles
+    posA_rot, velA_rot = rotdisk(posA, velA, iA, -1)
+    posB_rot, velB_rot = rotdisk(posB, velB, iB, 1)
 
     #Translate each galacy so COM is at origin
-    pos_m = np.array([[0, Rapoc, 0], [0, -Rapoc, 0]])
+    Rapoc = R_min*(1+e)/(1-e)
+    pos_m = np.array([[0, -Rapoc, 0], [0, Rapoc, 0]])
 
-    posA_CM = posA+pos_m[0]
-    posB_CM = posB+pos_m[1]
+    posA_CM = posA_rot+pos_m[0]
+    posB_CM = posB_rot+pos_m[1]
+
+    #Set the velocities of the each galaxy TODO
+    vel_m = np.array([[0, 0, 0], [0, 0, 0]])
+
+    velA_CM = velA_rot+vel_m[0]
+    velB_CM = velB_rot+vel_m[1]
 
     pos_CM = np.concatenate((posA_CM, posB_CM), axis=0)
     vel_CM = np.concatenate((velA_CM, velB_CM), axis=0)
 
-    return pos_CM, pos_CM, vel_CM
+    return pos_m, vel_m, pos_CM, vel_CM
 
     
 def initdisk(R_min:float, mass:float, epsilon:float) ->tuple:
@@ -45,3 +48,16 @@ def initdisk(R_min:float, mass:float, epsilon:float) ->tuple:
             vel[curr] = velmag*veldirnorm
             curr+=1
     return pos, vel
+
+def rotdisk(pos: np.ndarray[float, Any], vel: np.ndarray[float, Any], i:float, n:float) -> tuple:
+
+    #Adjust angle based on whethere rotation is around postive or negative x axis
+    iadj = n*i*-1
+    #Rotate positions and velocity by -i around positive
+    #Create Rot Matrix around x axis
+    rot = np.array([[0, 0, 0], [0, np.cos(iadj), -1*np.sin(iadj)], [0, np.sin(iadj), np.cos(iadj)]])
+
+    pos_rot = (rot@pos.transpose()).transpose()
+    vel_rot = (rot@vel.transpose()).transpose()
+    return pos_rot, vel_rot
+
