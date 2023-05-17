@@ -55,7 +55,7 @@ def rotdisk(pos: np.ndarray[float, Any], vel: np.ndarray[float, Any], i:float, n
     iadj = n*i*-1
     #Rotate positions and velocity by -i around positive
     #Create Rot Matrix around x axis
-    rot = np.array([[0, 0, 0], [0, np.cos(iadj), -1*np.sin(iadj)], [0, np.sin(iadj), np.cos(iadj)]])
+    rot = np.array([[1, 0, 0], [0, np.cos(iadj), -1*np.sin(iadj)], [0, np.sin(iadj), np.cos(iadj)]])
 
     pos_rot = (rot@pos.transpose()).transpose()
     vel_rot = (rot@vel.transpose()).transpose()
