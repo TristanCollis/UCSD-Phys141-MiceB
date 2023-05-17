@@ -57,7 +57,7 @@ def leapfrog(init_pos: np.ndarray[float, Any], init_vel: np.ndarray[float, Any],
     position_m[0, :, :] = init_pos_massive
     velocity_m[0, :, :] = init_vel_massive
 
-    for i in range(time_step):
+    for i in range(timestep):
 
         # find the half step velocity
         vel = velocity[i, :, :] + (gravity.grav_3body(position[i, :, :],
