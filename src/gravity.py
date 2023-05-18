@@ -35,8 +35,8 @@ def grav_3body(
 
     return np.sum(
         masses.reshape(-1, 1, 1)
-        * (r / r_norm)
-        / (r_norm + epsilon)**2,
+        * r
+        / (r_norm + epsilon)**3,
         axis=0
     )
 
