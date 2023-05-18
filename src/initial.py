@@ -4,7 +4,7 @@ import numpy as np
 
 #The following functions assume the plane of orbit is the x, y axis, with positive 
 
-def initmice(R_min:float, mass:float, time_unit:float, wA:float, wB:float, iA:float, iB:float, e:float, epsilon:float) -> tuple :
+def initmice(R_min:float, mass:float, time_unit:float, wA:float, wB:float, iA:float, iB:float, ecc:float, epsilon:float) -> tuple :
 
     #Disk Inits in galaxy frame
     posA, velA = initdisk(R_min, mass, epsilon)
@@ -15,7 +15,8 @@ def initmice(R_min:float, mass:float, time_unit:float, wA:float, wB:float, iA:fl
     posB_rot, velB_rot = rotdisk(posB, velB, iB, 1)
 
     #Translate each galacy so COM is at origin
-    Rapoc = R_min*(1+e)/(1-e)
+    Rapoc = R_min*(1+ecc)/(1-ecc)
+    print(Rapoc)
     pos_m = np.array([[0, -Rapoc, 0], [0, Rapoc, 0]])
 
     posA_CM = posA_rot+pos_m[0]
@@ -27,8 +28,10 @@ def initmice(R_min:float, mass:float, time_unit:float, wA:float, wB:float, iA:fl
     a = (R_min+Rapoc)/2
 
     #Use vis a vis equation for orbital valocity
-    vel_mag = np.sqrt(2*mass*(2/(Rapoc)-1/a)) 
+    #vel_mag = np.sqrt(2*mass*(2/(Rapoc)-1/a))
 
+    #Use analytical equation from slides for velocity
+    vel_mag = np.sqrt((2*mass)/(R_min*(1+ecc)))*(1 - ecc)
     #Set Galaxy velocities
     vel_m = np.array([[vel_mag, 0, 0], [-vel_mag, 0, 0]])
 
@@ -66,7 +69,6 @@ def rotdisk(pos: np.ndarray[float, Any], vel: np.ndarray[float, Any], i:float, n
     #Create Rot Matrix around x axis
     rot = np.array([[1, 0, 0], [0, np.cos(iadj), -1*np.sin(iadj)], [0, np.sin(iadj), np.cos(iadj)]])
 
-    pos_rot = (rot@pos.transpose()).transpose()
-    vel_rot = (rot@vel.transpose()).transpose()
+    pos_rot = (rot@pos.T).T
+    vel_rot = (rot@vel.T).T
     return pos_rot, vel_rot
-
