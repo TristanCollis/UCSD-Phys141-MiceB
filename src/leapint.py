@@ -1,8 +1,7 @@
 from typing import Any
 
 import numpy as np
-from . import gravity
-
+import gravity
 def leapfrog(init_pos: np.ndarray[float, Any], init_vel: np.ndarray[float, Any], init_pos_massive: np.ndarray[float, Any], init_vel_massive: np.ndarray[float, Any], timestep: int, dt: float, masses: np.ndarray[float, Any], epsilon: float) -> tuple:
     """leapfrog integration for 3 massless bodies
 
