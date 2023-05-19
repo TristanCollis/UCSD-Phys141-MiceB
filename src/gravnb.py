@@ -23,7 +23,7 @@ def norm(array: np.ndarray[float, Any]) -> np.ndarray[float, Any]:
     )
 
 
-@njit
+@njit(float64[:,:](float64[:,:], float64[:,:], float64[:], float64),)
 def grav_3body(
         massless_points: np.ndarray[float, Any],
         massive_points: np.ndarray[float, Any],
@@ -54,13 +54,13 @@ def grav_3body(
     r_norm = add_dim(norm(r)).transpose(1, 2, 0)
 
     return np.sum(
-        masses.reshape(-1, 1, 1)
+        add_dim((add_dim(masses))).T
         * r
         / (r_norm + epsilon)**3,
         axis=0
     )
 
-
+@njit(float64[:,:](float64[:,:], float64[:], float64))
 def grav_direct(
         points: np.ndarray[float, Any],
         masses: np.ndarray[float, Any],
