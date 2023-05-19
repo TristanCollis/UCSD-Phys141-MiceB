@@ -4,11 +4,11 @@ import numpy as np
 
 #The following functions assume the plane of orbit is the x, y axis, with positive 
 
-def initmice(R_min:float, mass:float, time_unit:float, wA:float, wB:float, iA:float, iB:float, ecc:float, epsilon:float) -> tuple :
+def initmice(R_min:float, mass:float, time_unit:float, wA:float, wB:float, iA:float, iB:float, ecc:float, base_ring:int, epsilon:float) -> tuple :
 
     #Disk Inits in galaxy frame
-    posA, velA = initdisk(R_min, mass, epsilon)
-    posB, velB = initdisk(R_min, mass, epsilon)
+    posA, velA = initdisk(R_min, mass, epsilon, base_ring=base_ring)
+    posB, velB = initdisk(R_min, mass, epsilon, base_ring=base_ring)
 
     #Rotate galaxies according to angles
     posA_rot, velA_rot = rotdisk(posA, velA, iA, -1)
@@ -16,7 +16,7 @@ def initmice(R_min:float, mass:float, time_unit:float, wA:float, wB:float, iA:fl
 
     #Translate each galacy so COM is at origin
     Rapoc = R_min*(1+ecc)/(1-ecc)
-    print(Rapoc)
+    #print(Rapoc)
     pos_m = np.array([[0, -Rapoc, 0], [0, Rapoc, 0]])
 
     posA_CM = posA_rot+pos_m[0]
@@ -45,12 +45,12 @@ def initmice(R_min:float, mass:float, time_unit:float, wA:float, wB:float, iA:fl
     return pos_m, vel_m, pos_CM, vel_CM
 
     
-def initdisk(R_min:float, mass:float, epsilon:float) ->tuple:
+def initdisk(R_min:float, mass:float, epsilon:float, base_ring:int) ->tuple:
     pos = np.zeros((297, 3))
     vel = np.zeros((297, 3))
     curr = 0
     for i in range(0, 11):
-        num_particles = 3*i + 12
+        num_particles = 3*i + base_ring
         radius = (0.05*i + 0.2)*R_min
         for j in range(0, num_particles):
             angle = (2.0*np.pi /num_particles)*j
