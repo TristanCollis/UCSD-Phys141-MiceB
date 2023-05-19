@@ -1,15 +1,29 @@
 from typing import Any
 
 import numpy as np
-from numba import njit, float64
+import numba as nb  # type: ignore
+from numba import jit, njit, float64, int32
+
+
+@njit(["float64[:, :, :](float64[:, :])", "float64[:,:](float64[:])"])
+def add_dim(array: np.ndarray[float, Any]) -> np.ndarray[float, Any]:
+    output = np.empty((1, *array.shape))
+    output[0] = array
+
+    return output
+
+
+@njit(["float64[:,:](float64[:,:,:])", "float64[:](float64[:,:])"])
+def norm(array: np.ndarray[float, Any]) -> np.ndarray[float, Any]:
+    return np.sqrt(
+        np.sum(
+            array**2,
+            axis=-1
+        )
+    )
 
 
 @njit
-def norm(array: np.ndarray[float, Any], axis: int) -> np.ndarray[float, Any]:
-    return np.sqrt(np.sum(array**2, axis=axis))
-
-
-@njit(float64[:,:](float64[:,:], float64[:,:], float64[:,:], float64))
 def grav_3body(
         massless_points: np.ndarray[float, Any],
         massive_points: np.ndarray[float, Any],
@@ -35,20 +49,18 @@ def grav_3body(
         Accelerations to be applied to the massless bodies.
     """
 
-    r = (np.expand_dims(massive_points, 1)
-         - np.expand_dims(massless_points, 0))
+    r = add_dim(massive_points).transpose(1, 0, 2) - add_dim(massless_points)
 
-    r_norm = np.expand_dims(norm(r, axis=2), 2)
+    r_norm = add_dim(norm(r)).transpose(1, 2, 0)
 
     return np.sum(
-        np.expand_dims(masses, (1, 1))
-        * (r / r_norm)
-        / (r_norm + epsilon)**2,
+        masses.reshape(-1, 1, 1)
+        * r
+        / (r_norm + epsilon)**3,
         axis=0
     )
 
 
-@njit(float64[:,:](float64[:,:], float64[:,:], float64))
 def grav_direct(
         points: np.ndarray[float, Any],
         masses: np.ndarray[float, Any],
@@ -72,5 +84,3 @@ def grav_direct(
     """
 
     return grav_3body(points, points, masses, epsilon)
-
-
